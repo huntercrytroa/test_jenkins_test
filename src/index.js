@@ -5,11 +5,11 @@ const app = express();
 const port = 3000;
 
 // Middleware เพื่อให้ Express รู้จักไฟล์ static (เช่น CSS, JS, รูปภาพ)
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // เส้นทางหลักที่ส่งไฟล์ HTML ให้ผู้ใช้
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
 });
 
 app.listen(port, () => {
