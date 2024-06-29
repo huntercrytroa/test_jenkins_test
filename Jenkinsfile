@@ -57,10 +57,10 @@ pipeline {
         always {
             echo 'Cleaning up...'
             // Clean up dangling images
-            sh '''
-                echo "Cleaning up dangling images..."
-                docker image prune -f
-            '''
+            // sh '''
+            //     echo "Cleaning up dangling images..."
+            //     docker image prune -f
+            // '''
         }
     }
 }
