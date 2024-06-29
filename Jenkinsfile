@@ -1,50 +1,50 @@
 pipeline {
     agent any
+
     environment {
-        DOCKER_IMAGE = "my-docker-registry/test_jenkins:latest"
+        DOCKER_IMAGE = 'my_app'
     }
+
     stages {
         stage('Checkout') {
             steps {
-                // git 'https://github.com/apipat-coforge/test_jenkins.git'
-                git branch: 'dev', url: 'https://github.com/apipat-coforge/test_jenkins.git'
-
-            }
-        }
-        stage('Install Dependencies') {
-            steps {
-                sh 'npm install'
+                git branch: 'dev', url: 'https://github.com/huntercrytroa/test_jenkins_test.git'
             }
         }
         stage('Build') {
             steps {
-                sh 'npm run build'
+                echo 'Building...'
+                // Build Docker image
+                sh '''
+                    echo "Building Docker image..."
+                    docker build -t ${DOCKER_IMAGE} .
+                '''
             }
         }
         stage('Test') {
             steps {
-                sh 'npm test'
-            }
-        }
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    docker.build(DOCKER_IMAGE)
-                }
-            }
-        }
-        stage('Push Docker Image') {
-            steps {
-                script {
-                    docker.withRegistry('https://my-docker-registry', 'docker-registry-credentials') {
-                        docker.image(DOCKER_IMAGE).push()
-                    }
-                }
+                echo 'Testing...'
+                // Add your test commands here
+                sh '''
+                    echo "Running tests..."
+                    # ตัวอย่างคำสั่งในการรันเทส
+                    # npm test
+                '''
             }
         }
         stage('Deploy') {
             steps {
-                sh 'kubectl apply -f k8s/deployment.yaml'
+                echo 'Deploying...'
+                // Stop any container using port 3000
+                sh '''
+                    echo "Stopping any container using port 3000..."
+                    docker ps -q --filter "publish=3000" | grep -q . && docker stop $(docker ps -q --filter "publish=3000")
+                '''
+                // Run Docker container
+                sh '''
+                    echo "Running Docker container..."
+                    docker run -d -p 3000:3000 ${DOCKER_IMAGE}
+                '''
             }
         }
     }
