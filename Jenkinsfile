@@ -35,6 +35,11 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploying...'
+                // Stop any container using port 3000
+                sh '''
+                    echo "Stopping any container using port 3000..."
+                    docker ps -q --filter "publish=3000" | grep -q . && docker stop $(docker ps -q --filter "publish=3000")
+                '''
                 // Run Docker container
                 sh '''
                     echo "Running Docker container..."
