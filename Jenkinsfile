@@ -27,7 +27,7 @@ pipeline {
                 // Add your test commands here
                 sh '''
                     echo "Running tests..."
-                    # ตัวอย่างคำสั่งในการรันเทส
+                    # Example test command
                     # npm test
                 '''
             }
