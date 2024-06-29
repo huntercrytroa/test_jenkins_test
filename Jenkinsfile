@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'docker:latest'
+            args '--privileged -v /var/run/docker.sock:/var/run/docker.sock'
+        }
+    }
 
     environment {
         DOCKER_IMAGE = 'my_app'
@@ -17,6 +22,7 @@ pipeline {
                 // Build Docker image
                 sh '''
                     echo "Building Docker image..."
+                    docker --version
                     docker build -t ${DOCKER_IMAGE} .
                 '''
             }
@@ -27,6 +33,7 @@ pipeline {
                 // Add your test commands here
                 sh '''
                     echo "Running tests..."
+                    docker --version
                     # Example test command
                     # npm test
                 '''
@@ -38,6 +45,7 @@ pipeline {
                 // Stop any container using port 3000
                 sh '''
                     echo "Stopping any container using port 3000..."
+                    docker --version
                     docker ps -q --filter "publish=3000" | grep -q . && docker stop $(docker ps -q --filter "publish=3000")
                 '''
                 // Remove stopped containers
@@ -57,10 +65,10 @@ pipeline {
         always {
             echo 'Cleaning up...'
             // Clean up dangling images
-            // sh '''
-            //     echo "Cleaning up dangling images..."
-            //     docker image prune -f
-            // '''
+            sh '''
+                echo "Cleaning up dangling images..."
+                docker image prune -f
+            '''
         }
     }
 }
