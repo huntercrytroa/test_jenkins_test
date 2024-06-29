@@ -1,14 +1,17 @@
-const http = require('http');
+const express = require('express');
+const path = require('path');
 
-const hostname = '0.0.0.0';
+const app = express();
 const port = 3000;
 
-const server = http.createServer((req, res) => {
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'text/plain');
-  res.end('Hello World\n');
+// Middleware เพื่อให้ Express รู้จักไฟล์ static (เช่น CSS, JS, รูปภาพ)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// เส้นทางหลักที่ส่งไฟล์ HTML ให้ผู้ใช้
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-server.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}/`);
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}/`);
 });
