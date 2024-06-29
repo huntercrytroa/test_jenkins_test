@@ -40,12 +40,27 @@ pipeline {
                     echo "Stopping any container using port 3000..."
                     docker ps -q --filter "publish=3000" | grep -q . && docker stop $(docker ps -q --filter "publish=3000")
                 '''
+                // Remove stopped containers
+                sh '''
+                    echo "Removing stopped containers..."
+                    docker container prune -f
+                '''
                 // Run Docker container
                 sh '''
                     echo "Running Docker container..."
-                    docker run -d -p 3000:3000 ${DOCKER_IMAGE}
+                    docker run -d -p 3000:3000 --name my_app_container ${DOCKER_IMAGE}
                 '''
             }
+        }
+    }
+    post {
+        always {
+            echo 'Cleaning up...'
+            // Clean up dangling images
+            sh '''
+                echo "Cleaning up dangling images..."
+                docker image prune -f
+            '''
         }
     }
 }
