@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            image 'docker:latest'
+            image 'docker:19.03.12' // ใช้ Docker image ที่มี Docker ติดตั้งอยู่
             args '--privileged -v /var/run/docker.sock:/var/run/docker.sock'
         }
     }
