@@ -1,0 +1,16 @@
+{
+    "name": "test_jenkins",
+    "version": "1.0.0",
+    "description": "A simple Node.js project for Jenkins CI/CD",
+    "main": "src/index.js",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1",
+      "start": "node src/index.js",
+      "build": "echo \"Build step - add your build scripts here\""
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+      "express": "^4.17.1"
+    }
+  }
