@@ -6,7 +6,9 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/apipat-coforge/test_jenkins.git'
+                // git 'https://github.com/apipat-coforge/test_jenkins.git'
+                git branch: 'dev', url: 'https://github.com/apipat-coforge/test_jenkins.git'
+
             }
         }
         stage('Install Dependencies') {
