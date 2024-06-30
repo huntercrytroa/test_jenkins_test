@@ -55,14 +55,12 @@ pipeline {
     }
     post {
         always {
-            node {
-                echo 'Cleaning up...'
-                // Clean up dangling images
-                sh '''
-                    echo "Cleaning up dangling images..."
-                    docker image prune -f
-                '''
-            }
+            echo 'Cleaning up...'
+            // Clean up dangling images
+            sh '''
+                echo "Cleaning up dangling images..."
+                docker image prune -f
+            '''
         }
     }
 }
