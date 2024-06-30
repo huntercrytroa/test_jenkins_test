@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'docker:19.03.12' // ใช้ Docker image ที่มี Docker ติดตั้งอยู่
-            args '--privileged -v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    }
+    agent any
 
     environment {
         DOCKER_IMAGE = 'my_app'
@@ -22,7 +17,6 @@ pipeline {
                 // Build Docker image
                 sh '''
                     echo "Building Docker image..."
-                    docker --version
                     docker build -t ${DOCKER_IMAGE} .
                 '''
             }
@@ -33,7 +27,6 @@ pipeline {
                 // Add your test commands here
                 sh '''
                     echo "Running tests..."
-                    docker --version
                     # Example test command
                     # npm test
                 '''
@@ -45,7 +38,6 @@ pipeline {
                 // Stop any container using port 3000
                 sh '''
                     echo "Stopping any container using port 3000..."
-                    docker --version
                     docker ps -q --filter "publish=3000" | grep -q . && docker stop $(docker ps -q --filter "publish=3000")
                 '''
                 // Remove stopped containers
@@ -63,12 +55,14 @@ pipeline {
     }
     post {
         always {
-            echo 'Cleaning up...'
-            // Clean up dangling images
-            sh '''
-                echo "Cleaning up dangling images..."
-                docker image prune -f
-            '''
+            node {
+                echo 'Cleaning up...'
+                // Clean up dangling images
+                sh '''
+                    echo "Cleaning up dangling images..."
+                    docker image prune -f
+                '''
+            }
         }
     }
 }
