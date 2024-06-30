@@ -3,8 +3,6 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'my_app'
-        KUBECONFIG_CREDENTIALS_ID = 'your-kubeconfig-credentials-id'
-        DOCKER_REGISTRY = 'my-docker-registry'
     }
 
     stages {
@@ -21,12 +19,6 @@ pipeline {
                     echo "Building Docker image..."
                     docker build -t ${DOCKER_IMAGE} .
                 '''
-                // Tag and push Docker image to registry
-                sh '''
-                    echo "Tagging and pushing Docker image..."
-                    docker tag ${DOCKER_IMAGE} ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:latest
-                    docker push ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:latest
-                '''
             }
         }
         stage('Test') {
@@ -40,12 +32,24 @@ pipeline {
                 '''
             }
         }
-        stage('Deploy to Kubernetes') {
+        stage('Deploy') {
             steps {
-                echo 'Deploying to Kubernetes...'
-                withCredentials([file(credentialsId: env.KUBECONFIG_CREDENTIALS_ID, variable: 'KUBECONFIG')]) {
-                    sh 'kubectl apply -f deployment.yaml --kubeconfig=$KUBECONFIG'
-                }
+                echo 'Deploying...'
+                Stop any container using port 3000
+                sh '''
+                    echo "Stopping any container using port 3000..."
+                    docker ps -q --filter "publish=3000" | grep -q . && docker stop $(docker ps -q --filter "publish=3000")
+                '''
+                Remove stopped containers
+                sh '''
+                    echo "Removing stopped containers..."
+                    docker container prune -f
+                '''
+                Run Docker container
+                sh '''
+                    echo "Running Docker container..."
+                    docker run -d -p 3000:3000 --name my_app_container ${DOCKER_IMAGE}
+                '''
             }
         }
     }
