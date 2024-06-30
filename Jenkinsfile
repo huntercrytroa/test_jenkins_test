@@ -36,10 +36,14 @@ pipeline {
             steps {
                 echo 'Deploying...'
                 // Stop any container using port 3000
-                sh '''
-                    echo "Stopping any container using port 3000..."
-                    docker ps -q --filter "publish=3000" | grep -q . && docker stop $(docker ps -q --filter "publish=3000")
-                '''
+                script {
+                    def containerId = sh(script: "docker ps -q --filter 'publish=3000'", returnStdout: true).trim()
+                    if (containerId) {
+                        sh "docker stop ${containerId}"
+                    } else {
+                        echo "No container running on port 3000."
+                    }
+                }
                 // Remove stopped containers
                 sh '''
                     echo "Removing stopped containers..."
