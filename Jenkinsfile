@@ -3,6 +3,8 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'my_app'
+        KUBECONFIG_CREDENTIALS_ID = 'your-kubeconfig-credentials-id'
+        DOCKER_REGISTRY = 'my-docker-registry'
     }
 
     stages {
@@ -19,6 +21,12 @@ pipeline {
                     echo "Building Docker image..."
                     docker build -t ${DOCKER_IMAGE} .
                 '''
+                // Tag and push Docker image to registry
+                sh '''
+                    echo "Tagging and pushing Docker image..."
+                    docker tag ${DOCKER_IMAGE} ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:latest
+                    docker push ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:latest
+                '''
             }
         }
         stage('Test') {
@@ -32,28 +40,12 @@ pipeline {
                 '''
             }
         }
-        stage('Deploy') {
+        stage('Deploy to Kubernetes') {
             steps {
-                echo 'Deploying...'
-                // Stop any container using port 3000
-                script {
-                    def containerId = sh(script: "docker ps -q --filter 'publish=3000'", returnStdout: true).trim()
-                    if (containerId) {
-                        sh "docker stop ${containerId}"
-                    } else {
-                        echo "No container running on port 3000."
-                    }
+                echo 'Deploying to Kubernetes...'
+                withCredentials([file(credentialsId: env.KUBECONFIG_CREDENTIALS_ID, variable: 'KUBECONFIG')]) {
+                    sh 'kubectl apply -f deployment.yaml --kubeconfig=$KUBECONFIG'
                 }
-                // Remove stopped containers
-                sh '''
-                    echo "Removing stopped containers..."
-                    docker container prune -f
-                '''
-                // Run Docker container
-                sh '''
-                    echo "Running Docker container..."
-                    docker run -d -p 3000:3000 --name my_app_container ${DOCKER_IMAGE}
-                '''
             }
         }
     }
