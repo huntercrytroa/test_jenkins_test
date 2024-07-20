@@ -1,5 +1,5 @@
 # ใช้ base image ของ Node.js เวอร์ชั่น 14 สำหรับการ build
-FROM node:14 AS build
+FROM node:16 AS build
 
 # ตั้งค่า working directory เป็น /app
 WORKDIR /app
