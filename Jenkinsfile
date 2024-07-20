@@ -56,25 +56,5 @@ pipeline {
                 '''
             }
         }
-        stage('Cleanup') {
-            steps {
-                echo 'Cleaning up...'
-                // Stop and remove the running container
-                script {
-                    def containerId = sh(script: "docker ps -q --filter 'name=my_app_container'", returnStdout: true).trim()
-                    if (containerId) {
-                        sh "docker stop ${containerId}"
-                        sh "docker rm ${containerId}"
-                    } else {
-                        echo "No container named my_app_container is running."
-                    }
-                }
-                // Remove Docker image
-                sh '''
-                    echo "Removing Docker image..."
-                    docker rmi ${DOCKER_IMAGE}
-                '''
-            }
-        }
     }
 }
