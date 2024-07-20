@@ -14,11 +14,19 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building...'
-                // Build Docker image
-                sh '''
-                    echo "Building Docker image..."
-                    docker build -t ${DOCKER_IMAGE} .
-                '''
+                // Check if Dockerfile exists
+                script {
+                    def dockerfileExists = fileExists 'Dockerfile'
+                    if (dockerfileExists) {
+                        // Build Docker image
+                        sh '''
+                            echo "Building Docker image..."
+                            docker build -t ${DOCKER_IMAGE} .
+                        '''
+                    } else {
+                        error "Dockerfile not found in the current directory."
+                    }
+                }
             }
         }
         stage('Test') {
@@ -70,10 +78,17 @@ pipeline {
                     }
                 }
                 // Remove unused Docker images
-                sh '''
-                    echo "Removing unused Docker images..."
-                    docker image prune -f
-                '''
+                script {
+                    def imageExists = sh(script: "docker images -q ${DOCKER_IMAGE}", returnStdout: true).trim()
+                    if (imageExists) {
+                        sh '''
+                            echo "Removing unused Docker images..."
+                            docker image prune -f
+                        '''
+                    } else {
+                        echo "No Docker images named ${DOCKER_IMAGE} exist."
+                    }
+                }
             }
         }
     }
