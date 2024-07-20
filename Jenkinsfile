@@ -69,11 +69,6 @@ pipeline {
                         echo "No container named my_app_container is running."
                     }
                 }
-                // Remove Docker image
-                sh '''
-                    echo "Removing Docker image..."
-                    docker rmi ${DOCKER_IMAGE}
-                '''
                 // Remove unused Docker images
                 sh '''
                     echo "Removing unused Docker images..."
