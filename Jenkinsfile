@@ -56,5 +56,15 @@ pipeline {
                 '''
             }
         }
+        stage('Cleanup') {
+            steps {
+                echo 'Cleaning up...'
+                // Remove Docker image
+                sh '''
+                    echo "Removing Docker image..."
+                    docker rmi ${DOCKER_IMAGE}
+                '''
+            }
+        }
     }
 }
